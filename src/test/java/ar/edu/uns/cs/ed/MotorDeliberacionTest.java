@@ -5,10 +5,15 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import ar.edu.uns.cs.ed.tdas.excepciones.EmptyStackException;
+import ar.edu.uns.cs.ed.tdas.tdadiccionario.DiccionarioHashAbierto;
 import ar.edu.uns.cs.ed.tdas.tdalista.PositionList;
+import ar.edu.uns.cs.ed.MotorDeliberacion;
+import ar.edu.uns.cs.ed.Opinion;
+import ar.edu.uns.cs.ed.Usuario;
 
 /**
  * Tests de MotorDeliberacion .
+ * Tests de MotorDeliveracion (JUnit 4).
  * En cada test se arma un debate de 16 nodos ("Dar asueto por el día del estudiante"):
  *
  * debate1 (usr1)
@@ -42,7 +47,8 @@ public class MotorDeliberacionTest {
 
     @Before
     public void setUp() {
-        motor = new MotorDeliveracion();
+        motor = new MotorDeliberacion();
+        
         construirArbolCompleto();
     }
 
@@ -108,7 +114,7 @@ public class MotorDeliberacionTest {
 
     @Test
     public void crearDebate_registraAlCreadorEnElIndicePorUsuario() {
-        MotorDeliveracion m = new MotorDeliveracion();
+         MotorDeliberacion m = new MotorDeliberacion();
         m.crearDebate("d1", "tema", "usr9", "usr9");
         PositionList<Opinion> res = m.consultarArgumentosPorUsuario("usr9");
         assertEquals(1, res.size());
@@ -117,17 +123,17 @@ public class MotorDeliberacionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void crearDebate_idVacio_lanzaExcepcion() {
-        new MotorDeliveracion().crearDebate(" ", "texto", "usr1", "usr1");
+        new MotorDeliberacion().crearDebate(" ", "texto", "usr1", "usr1");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void crearDebate_textoVacio_lanzaExcepcion() {
-        new MotorDeliveracion().crearDebate("d1", "", "usr1", "usr1");
+        new MotorDeliberacion().crearDebate("d1", "", "usr1", "usr1");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void crearDebate_usuarioVacio_lanzaExcepcion() {
-        new MotorDeliveracion().crearDebate("d1", "texto", " ", "usr1");
+        new MotorDeliberacion().crearDebate("d1", "texto", " ", "usr1");
     }
 
     @Test(expected = IllegalStateException.class)
@@ -178,7 +184,7 @@ public class MotorDeliberacionTest {
 
     @Test(expected = IllegalStateException.class)
     public void postear_sinDebateCreado_lanzaExcepcion() {
-        new MotorDeliveracion().Postear(usr1, "posteoX", "debate1", "AFAVOR", "texto");
+        new MotorDeliberacion().Postear(usr1, "posteoX", "debate1", "AFAVOR", "texto");
     }
 
     // ---------------------- eliminarPosteo ----------------------
@@ -341,7 +347,7 @@ public class MotorDeliberacionTest {
 
     @Test(expected = EmptyStackException.class)
     public void deshacer_sinOperaciones_lanzaExcepcion() throws Exception {
-        new MotorDeliveracion().deshacerUltimaOperacion();
+        new MotorDeliberacion().deshacerUltimaOperacion();
     }
 
     @Test
@@ -375,7 +381,7 @@ public class MotorDeliberacionTest {
     //@Ignore("Bug: clearDebate() vacía la pila y luego top() lanza EmptyStackException")
     @Test
     public void deshacer_crearDebate_limpiaElDebate() throws Exception {
-        MotorDeliveracion m = new MotorDeliveracion();
+        MotorDeliberacion m = new MotorDeliberacion();
         m.crearDebate("d1", "tema", "usr1", "usr1");
         m.deshacerUltimaOperacion();
         try {
@@ -394,7 +400,101 @@ public class MotorDeliberacionTest {
         assertEquals(3, motor.consultarArgumentosPorUsuario("usr2").size());
         assertEquals(2, motor.consultarArgumentosPorUsuario("usr5").size());
     }
+        @Test 
+    public  void calcularPolarizacionDebate()
+    {
+        DiccionarioHashAbierto<String,DiccionarioHashAbierto<String,Integer>> polarizacion = motor.calcularPolarizacionDebate();
+        
+        assertEquals(16, polarizacion.size());
+        assertPolarizacion(polarizacion.find("posteo1").getValue(),3, 3);
+        assertPolarizacion(polarizacion.find("posteo13").getValue(),2, 1);   
+     }
 
+    // ----- calcularPolarizacionNodo -----
+
+    @Test(expected = IllegalStateException.class)
+    public void polarizacionNodo_sinDebate_lanzaExcepcion() {
+        new MotorDeliberacion().calcularPolarizacionNodo("debate1");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void polarizacionNodo_idInexistente_lanzaExcepcion() {
+        motor.calcularPolarizacionNodo("noExiste");
+    }
+    
+    private <V> void assertPolarizacion(DiccionarioHashAbierto<String, Integer> dic, int afavor, int encontra) {
+        assertEquals(Integer.valueOf(afavor), dic.find("AFAVOR").getValue());
+        assertEquals(Integer.valueOf(encontra), dic.find("ENCONTRA").getValue());
+    }
+
+    @Test
+    public void polarizacionNodo_raiz_cuentaTodosLosPosteosSinLaRaiz() {
+        // 8 AFAVOR + 7 ENCONTRA = 15 posteos; la raíz (ROOT) no suma.
+        assertPolarizacion(motor.calcularPolarizacionNodo("debate1"), 8, 7);
+    }
+
+    @Test
+    public void polarizacionNodo_nodosIntermedios() {
+        assertPolarizacion(motor.calcularPolarizacionNodo("posteo1"), 3, 3);
+        assertPolarizacion(motor.calcularPolarizacionNodo("posteo2"), 3, 3);
+        assertPolarizacion(motor.calcularPolarizacionNodo("posteo3"), 1, 2);
+        assertPolarizacion(motor.calcularPolarizacionNodo("posteo4"), 1, 1);
+        assertPolarizacion(motor.calcularPolarizacionNodo("posteo5"), 2, 1);
+        assertPolarizacion(motor.calcularPolarizacionNodo("posteo6"), 1, 1);
+        assertPolarizacion(motor.calcularPolarizacionNodo("posteo13"), 2, 1);
+    }
+
+    @Test
+    public void polarizacionNodo_hojaAFavor_cuentaSoloAsiMisma() {
+        assertPolarizacion(motor.calcularPolarizacionNodo("posteo7"), 1, 0);
+        assertPolarizacion(motor.calcularPolarizacionNodo("posteo15"), 1, 0);
+    }
+
+    @Test
+    public void polarizacionNodo_hojaEnContra_cuentaSoloAsiMisma() {
+        assertPolarizacion(motor.calcularPolarizacionNodo("posteo8"), 0, 1);
+        assertPolarizacion(motor.calcularPolarizacionNodo("posteo14"), 0, 1);
+    }
+
+    @Test
+    public void polarizacionNodo_tieneSoloLasClavesAfavorYEncontra() {
+        DiccionarioHashAbierto<String, Integer> pol = motor.calcularPolarizacionNodo("posteo1");
+        assertNotNull(pol.find("AFAVOR"));
+        assertNotNull(pol.find("ENCONTRA"));
+    }
+
+    @Test
+    public void polarizacionNodo_seActualizaAlPostear() {
+        // Nuevo AFAVOR bajo posteo7: suma en posteo7, posteo3, posteo1 y la raíz.
+        motor.Postear(usr1, "posteoNuevo", "posteo7", "AFAVOR", "texto");
+        assertPolarizacion(motor.calcularPolarizacionNodo("posteo7"), 2, 0);
+        assertPolarizacion(motor.calcularPolarizacionNodo("posteo3"), 2, 2);
+        assertPolarizacion(motor.calcularPolarizacionNodo("posteo1"), 4, 3);
+        assertPolarizacion(motor.calcularPolarizacionNodo("debate1"), 9, 7);
+        // Las otras ramas no cambian.
+        assertPolarizacion(motor.calcularPolarizacionNodo("posteo2"), 3, 3);
+    }
+
+    @Test
+    public void polarizacionNodo_seActualizaAlEliminar() {
+        motor.eliminarPosteo("usr2", "posteo1");
+        assertPolarizacion(motor.calcularPolarizacionNodo("debate1"), 5, 4);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void polarizacionNodo_nodoEliminado_lanzaExcepcion() {
+        motor.eliminarPosteo("usr2", "posteo1");
+        motor.calcularPolarizacionNodo("posteo3");
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void polarizacionNodo_despuesDeClearDebate_lanzaExcepcion() {
+        motor.clearDebate();
+        motor.calcularPolarizacionNodo("debate1");
+    }
+
+
+////////////////////////////////////
     @Test public void mostrarDebate() {
         System.out.println("Árbol de debate:");
         motor.imprimirDebate();

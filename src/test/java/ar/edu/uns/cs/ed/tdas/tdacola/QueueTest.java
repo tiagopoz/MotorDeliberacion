@@ -18,7 +18,7 @@ public class QueueTest {
 	private Queue<String> getQueue()
 	{
 		Queue<String> c = null;
-		//c = new ColaEnlazada<String>(); //TODO: Descomentar y crear instancia del TDA a testear
+		c = new Cola<String>(); //TODO: Descomentar y crear instancia del TDA a testear
 		return c;
 	 }
 	

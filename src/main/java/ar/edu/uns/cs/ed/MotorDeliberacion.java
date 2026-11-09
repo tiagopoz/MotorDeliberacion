@@ -1,7 +1,7 @@
 package ar.edu.uns.cs.ed;
 
-import main.java.ar.edu.uns.cs.ed.tdas.excepciones.InvalidPositionException;
-import main.java.ar.edu.uns.cs.ed.tdas.tdalista.PositionList;
+import ar.edu.uns.cs.ed.tdas.excepciones.InvalidPositionException;
+import ar.edu.uns.cs.ed.tdas.tdalista.PositionList;
 
 /**
  * Incluir los import necesarios para las clases utilizadas en el código.
@@ -72,7 +72,7 @@ public class MotorDeliberacion {
     public void Postear(Usuario usr, String idNuevo, String idPadre, String postura, String texto) {
         //TODO: Implementar la funcionalidad de postear un nuevo argumento en el debate.
     }
-    
+
 
     // Elimina un posteo y todo el subárbol.
     public void eliminarPosteo(String idUsuario, String idPosteo) {
@@ -94,8 +94,30 @@ public class MotorDeliberacion {
     //TODO: Implementar la funcionalidad de consultar los argumentos de un usuario específico en el debate.
     }
 
+    /**
+     * Calcula la polarización de todos los nodos del debate.
+     * La polarización se define como la cantidad de argumentos a favor y en contra que existen en el subárbol que tiene como raíz cada nodo.
+     * @throws IllegalStateException si no hay un debate activo.
+     * @return Un diccionario cuya clave es el ID del nodo y el valor es un diccionario con la polarización: 
+     * "AFAVOR" y "ENCONTRA" y sus respectivos conteos.
+     */
+    public DiccionarioHashAbierto<String,DiccionarioHashAbierto<String,Integer>> calcularPolarizacionDebate(){
+        //TODO
+    }
+
+     /**
+    * Calcula la polarización de un nodo específico en el árbol de debate.
+    * La polarización se define como la cantidad de argumentos a favor y en contra que existen en el subárbol que tiene como raíz el nodo especificado por idNodo.
+    * @throws IllegalStateException si no hay un debate activo. 
+    * @param idNodo : Identificador del nodo para el cual se desea calcular la polarización.
+    * @return Un DiccionarioHashAbierto<String,Integer> que contiene la polarización del nodo, con las claves "AFAVOR" y "ENCONTRA" y sus respectivos conteos.
+    */
+    public DiccionarioHashAbierto<String,Integer> calcularPolarizacionNodo(String idNodo){
+        //TODO
+
+    }
  /*** Mostrar árbol por consola ***/
- 
+
     /**
      * Imprime por consola, en modo texto, el contenido del árbol de debate,
      * con indentación jerárquica que muestra la estructura padre-hijo.
@@ -130,13 +152,13 @@ public class MotorDeliberacion {
 
         for (Position<Opinion> hijo : arbol.children(nodo)) {
             boolean esUltimo = (hijo == hijos.last().element());
-            
+
             String conector = esUltimo ? "└── " : "├── ";
             System.out.println(prefijo + conector + formatearNodo(hijo.element()));
 
             String prefijoHijo = prefijo + (esUltimo ? "    " : "│   ");
             imprimirHijos(hijo, prefijoHijo);
-            
+
         }
     }
 
@@ -149,5 +171,3 @@ public class MotorDeliberacion {
                 + "usuario=" + a.getUsuario().getId() + " -> " + a.getTexto();
     }
 }
-
-
