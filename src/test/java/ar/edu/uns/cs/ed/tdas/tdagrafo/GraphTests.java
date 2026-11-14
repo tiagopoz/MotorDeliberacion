@@ -39,7 +39,7 @@ public class GraphTests {
 	 */
 	@Before
 	public void setUp() {
-		//graph = new ListaDeAdyacencias<Object, Object>(); //TODO: Descomentar y crear instancia del TDA a testear
+		graph = new Grafo<Object, Object>(); //TODO: Descomentar y crear instancia del TDA a testear
 		o1 = new Object();
 		Assume.assumeNotNull(graph);
 	}

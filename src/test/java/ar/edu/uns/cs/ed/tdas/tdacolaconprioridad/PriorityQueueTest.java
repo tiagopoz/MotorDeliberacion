@@ -16,7 +16,7 @@ public class PriorityQueueTest {
 
 	private PriorityQueue<Integer, String> getPriorityQueue() {
 		PriorityQueue<Integer, String> ccp = null;
-		//ccp = new CCPconLista<Integer, String>(new Comparador<Integer>()); //TODO: Descomentar y crear instancia del TDA a testear
+		ccp = new CCPconlista<Integer, String>(new Comparador<Integer>()); //TODO: Descomentar y crear instancia del TDA a testear
 		return ccp;
 	}
 
